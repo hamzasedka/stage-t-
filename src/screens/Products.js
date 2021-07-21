@@ -14,6 +14,9 @@ function Products() {
   const [RelatedEvent,SetRelatedEvent]=useState();
   const [EventId,SetEventId]=useState();
 
+
+  ;
+
   useEffect(() => {
     Firebase.firestore().collectionGroup("staff").onSnapshot(snapShot=>{
       SetStaffList(snapShot.docs.map(doc=>
@@ -21,13 +24,13 @@ function Products() {
       
         ))
     });
+  
    
     return()=>{
       SetStaffList([]);
     }
     
   }, [EventId])
-console.log(staffList);
 
 
   const tableData=[];
@@ -55,20 +58,39 @@ console.log(staffList);
     setStaffId(id)
     SetEventId(eventId)
     hamza=eventId;
-    console.log(hamza);
     
       Firebase.firestore().collection('param').doc(hamza).get()
     .then(snapShot=>SetRelatedEvent(snapShot.data())
       );
     
   };
- 
+  
   return (
     <div style={
       { maxWidth: '80%' ,position:'relative',left:'10%',top:'50px'}}>
    <MaterialTable className='stafftable' title=""
    
    data={tableData}
+    detailPanel={rowData => {
+ 
+        return (
+          <table className="extratable">
+          <tr>
+            <th className="extrarow">BirthDay</th>
+            <th className="extrarow">CIN</th>
+            <th className="extrarow">socialState</th>
+            <th className="extrarow">Adress</th>
+          </tr>
+          <tr>
+            <td className="extrarow">{rowData.birthday}</td>
+            <td className="extrarow">{rowData.CIN}</td>
+            <td className="extrarow">{rowData.socialstate}</td>
+            <td className="extrarow">{rowData.adresse}</td>
+
+          </tr>
+          </table>
+        )
+      }}
    columns={tableColumns}
    onRowClick={((evt, selectedRow) => {
      setSelectedRow(selectedRow.tableData.id);
@@ -106,13 +128,14 @@ console.log(staffList);
         }, 500);
       }
     }
+    ,
+    
     
     
   ]}
-   />
   
-        <Modal staffId={staffId} RelatedEvent={RelatedEvent} showModal={showModal} setShowModal={setShowModal} />
-   
+   />
+  <Modal staffId={staffId} RelatedEvent={RelatedEvent} showModal={showModal} setShowModal={setShowModal} />
 
   </div>
   );

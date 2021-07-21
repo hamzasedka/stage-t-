@@ -7,6 +7,7 @@ import QRCode from 'react-qr-code';
 import Pdf from "react-to-pdf";
 import styled from 'styled-components';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import ReactDom from 'react-dom'
 import {
         Background,
         BarCode,
@@ -19,6 +20,8 @@ import {
         StaffDetails, 
         Staffimg, 
         StaffInfo } from '../styled-component/modal-styled';
+import { useDrag } from 'react-use-gesture';
+
 
 
 const CloseModalButton = styled(MdClose)`
@@ -44,6 +47,9 @@ export const Modal=({showModal,setShowModal,staffId,RelatedEvent})=> {
   const [ChartsId,SetChartsId]=useState();
   const [staffMember,SetStaffMember]=useState('');
   const [EventId,SetEventId]=useState();
+
+
+ 
   const modalRef = useRef();
   const animation = useSpring({
       config: {
@@ -162,68 +168,106 @@ export const Modal=({showModal,setShowModal,staffId,RelatedEvent})=> {
        }
       }
      
-      
-    return (
+     
+  
+      const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }))
+
+      // Set the drag hook and define component movement based on gesture data
+      const bind = useDrag(({ down, movement: [mx, my] }) => {
+        api.start({ x: down ? mx : 0, y: down ? my : 0 })
+      })
+
+   
+    return ReactDom.createPortal(
       <>
+      
+
         {showModal ? (
           <Background  id="divcontents" style={{zIndex:100}} onClick={closeModal} ref={modalRef} className="no-printme">
+             <animated.div
+                  {...bind()} style={{ x, y }}
+                  ><h1>skdghdksfh</h1></animated.div>
             <animated.div style={animation}>
               <ModalWrapper ref={ref} showModal={showModal}>
-                
+               
                 <ModalContent style={{backgroundImage:`url(${RelatedEvent.imgUrl})`}} className="printme">
                   <CardTitle>
                   </CardTitle>
-                  <StaffInfo>
-                    <Staffimg>
-                      <img style={{width:'100%'}} src={staffMember.imgUrl}/>
+                
+                    
+                  <StaffInfo 
+                  
+                  id="staffinfo"
+                  >
+                    
+                   
+                      
+                    <Staffimg
+                    
+                    id="staffimg"
+                   
+                    >
+                      <img  style={{width:'100%'}} src={staffMember.imgUrl}/>
                     </Staffimg>
-                    <StaffDetails>
+
+                 
+                  
+                 
+                  
+                    <StaffDetails
+                    id="staffdetails"
+                    
+                    >
                     {RelatedEvent.name?
-                      <span>
+                      <span >
                       <h5>Name :</h5>
                       <h4>{staffMember.name}</h4>
                       </span>:<span></span>}
                       {RelatedEvent?
-                      <span>
+                      <span >
                       <h5>Designation :</h5>
                       <h4>{staffMember.Designation}</h4>
                       </span>:<span></span>}
-                      {RelatedEvent.Joined?<span>
+                      {RelatedEvent.Joined?<span >
                       <h5>Joined :</h5>
                       <h4>{staffMember.Joined}</h4>
                       </span>:<span></span>}
                       {RelatedEvent.employeeNumber?
-                      <span>
+                      <span >
                       <h5>Employee Number :</h5>
                       <h4>{staffMember.employeeNumber}</h4>
                       </span>:<span></span>}
                       {RelatedEvent.city?
-                      <span>
+                      <span >
                       <h5>City :</h5>
                       <h4>{staffMember.city}</h4>
                       </span>:<span></span>}
                       {RelatedEvent.sex?
-                      <span>
+                      <span >
                       <h5>Sex :</h5>
                       <h4>{staffMember.sex}</h4>
                       </span>:<span></span>}
                     </StaffDetails>
+                    
                   </StaffInfo>
-                  <BarCode>
+                
+                  
+
+                  <BarCode
+                  >
                   <Barcode value={staffId} format="CODE128"   fontSize={10} background="transparent" width={1} height={20} />
                   </BarCode>
                   <QRCodee>
-                    <CompanyLogo>
+                    <CompanyLogo >
                     <QRCode value={staffId} size={80} level={"H"} />
     
                     </CompanyLogo>
-                    <EmployeeQRCode>
-                      <img style={{width:'100%'}} src='http://e-pirana.com/images/logo-3.png'/>
+                    <EmployeeQRCode  >
+                      <img  style={{width:'100%'}} src='http://e-pirana.com/images/logo-3.png'/>
                     </EmployeeQRCode>
                   </QRCodee>
                 </ModalContent>
                
-           
               </ModalWrapper>
               <Pdf targetRef={ref} filename={staffMember.name+".pdf"} options={options} x={.5} y={.5} scale={0.8} >
         {({toPdf}) => (
@@ -234,7 +278,9 @@ export const Modal=({showModal,setShowModal,staffId,RelatedEvent})=> {
             </animated.div>
           </Background>
         ) : null}
-      </>
+
+      </>,
+      document.getElementById('portal')
     );
 }
   export default Modal;
